@@ -24,6 +24,7 @@
 		27DF647A19657AD900B42725 /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
 		27DF647C19657B7500B42725 /* ListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 		92621703221BBBD500C6977A /* PhotoOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoOperations.swift; sourceTree = "<group>"; };
+		92621705221BF1E100C6977A /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +57,7 @@
 		27DF645F19657A9300B42725 /* ClassicPhotos */ = {
 			isa = PBXGroup;
 			children = (
+				92621705221BF1E100C6977A /* MyPlayground.playground */,
 				182A6AE920DDB39B00857A08 /* LaunchScreen.storyboard */,
 				27DF646219657A9300B42725 /* AppDelegate.swift */,
 				27DF646419657A9300B42725 /* Images.xcassets */,

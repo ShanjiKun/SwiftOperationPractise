@@ -45,10 +45,29 @@ class ListViewController: UITableViewController {
             
         default:
             indicator.startAnimating()
-            startOperations(for: photoDetails, at: indexPath)
+            if !tableView.isDragging && !tableView.isDecelerating {
+                startOperations(for: photoDetails, at: indexPath)
+            }
         }
 
         return cell
+    }
+    
+    //  MARK: UIScrollView Delegate
+    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        suspendAllOperations()
+    }
+    
+    override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            loadImagesForOnscreenCells()
+            resumeAllOperations()
+        }
+    }
+    
+    override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        loadImagesForOnscreenCells()
+        resumeAllOperations()
     }
 }
 
@@ -103,6 +122,52 @@ extension ListViewController {
         pendingOperations.filtrationInProgress[indexPath] = filterer
         
         pendingOperations.filtrationQueue.addOperation(filterer)
+    }
+    
+    func suspendAllOperations() {
+        pendingOperations.downloadQueue.isSuspended = true
+        pendingOperations.filtrationQueue.isSuspended = true
+    }
+    
+    func resumeAllOperations() {
+        pendingOperations.downloadQueue.isSuspended = false
+        pendingOperations.filtrationQueue.isSuspended = false
+    }
+    
+    func loadImagesForOnscreenCells() {
+        guard let visibleRows = tableView.indexPathsForVisibleRows else { return }
+        
+        var allPendingsOperations = Set(pendingOperations.downloadsInProgress.keys)
+        allPendingsOperations.formUnion(pendingOperations.filtrationInProgress.keys)
+        
+        let visiblePaths = Set(visibleRows)
+        
+        var toBeCancelled = allPendingsOperations
+        toBeCancelled.subtract(visiblePaths)
+        
+        var toBeStarted = visiblePaths
+        toBeStarted.subtract(allPendingsOperations)
+        
+        /// Cancel operations that do not visible on-screen
+        for indexPath in toBeCancelled {
+            if let pendingDownload = pendingOperations.downloadsInProgress[indexPath] {
+                pendingDownload.cancel()
+            }
+            
+            pendingOperations.downloadsInProgress.removeValue(forKey: indexPath)
+            
+            if let pendingFiltration = pendingOperations.downloadsInProgress[indexPath] {
+                pendingFiltration.cancel()
+            }
+            
+            pendingOperations.filtrationInProgress.removeValue(forKey: indexPath)
+        }
+        
+        /// Start operations that visible on-screen
+        for indexPath in toBeStarted {
+            let photoRecord = photos[indexPath.row]
+            startOperations(for: photoRecord, at: indexPath)
+        }
     }
 }
 
